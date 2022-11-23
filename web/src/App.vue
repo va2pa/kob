@@ -1,36 +1,17 @@
 <template>
-  <div>
-    <div>
-      用户名: {{ username }}
-    </div>
-    <div>
-      得分: {{ rating }}
-    </div>
-  </div>
+  <Navbar />
   <router-view/>
 </template>
 
 <script>
-  import { ref } from "vue";
-  import $ from "jquery";
+  import Navbar from "./components/NavBar.vue"
+  import "bootstrap/dist/css/bootstrap.min.css"
+  import "bootstrap/dist/js/bootstrap"
   export default {
     name: "App",
-    setup(){
-      let username = ref("");
-      let rating = ref("");
-      $.ajax({
-        url: "http://localhost:5000/user/info/",
-        method: "GET",
-        success: (res) => {
-          username.value = res.username;
-          rating.value = res.rating;
-        }
-      });
-      return{
-        username,
-        rating
-      }
-  }
+    components: {
+      Navbar,
+    }
 }
 </script>
 
