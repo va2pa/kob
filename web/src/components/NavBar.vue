@@ -38,7 +38,6 @@ export default {
     setup(){
         const route = new useRoute();
         let route_name = computed(() => route.name);
-        console.log(route_name);
         return {
             route_name
         }
