@@ -38,7 +38,13 @@ export class Snake extends GameObject{
         for(let i = k; i > 0; i --){
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
         }
-        
+    }
+
+    check_tail_increasing(){
+        if(this.step < 5){
+            return true;
+        }
+        return this.step % 3;
     }
 
     update_move(){
@@ -46,13 +52,27 @@ export class Snake extends GameObject{
         const dy = this.next_cell.y - this.cells[0].y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if(distance < this.eps){
+            // this.cells[0].r = this.next_cell.r;
+            // this.cells[0].c = this.next_cell.c;
             this.cells[0] = this.next_cell;
             this.next_cell = null;
             this.status = "idle";
+            if(!this.check_tail_increasing()){
+                this.cells.pop();
+            }
         }else{
             const move_distance = this.speed * this.timedelta / 1000;
             this.cells[0].x += move_distance * dx / distance;
             this.cells[0].y += move_distance * dy / distance;
+            if(!this.check_tail_increasing()){
+                const k = this.cells.length;
+                const tail = this.cells[k - 1];
+                const target_tail = this.cells[k - 2];
+                const tail_dx = target_tail.x - tail.x;
+                const tail_dy = target_tail.y - tail.y;
+                tail.x += move_distance * tail_dx / distance;
+                tail.y += move_distance * tail_dy / distance;
+            }
         }
         
     }

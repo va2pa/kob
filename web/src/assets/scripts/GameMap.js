@@ -11,7 +11,7 @@ export class GameMap extends GameObject {
         this.rows = 15;
         this.cols = 16;
         this.walls = [];
-        this.inner_walls_count = 80;
+        this.inner_walls_count = 20;
         this.snakes = [
             new Snake({id: 1, color: '#4876EC', r: this.rows - 2, c: 1}, this),
             new Snake({id: 2, color: '#F94848', r: 1, c: this.cols - 2}, this)
