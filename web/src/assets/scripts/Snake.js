@@ -90,8 +90,20 @@ export class Snake extends GameObject{
         ctx.fillStyle = this.color;
         for(let cell of this.cells){
             ctx.beginPath()
-            ctx.arc(cell.x * L, cell.y * L, L / 2, 0, 2 * Math.PI);
+            ctx.arc(cell.x * L, cell.y * L, L / 2 * 0.8, 0, 2 * Math.PI);
             ctx.fill();
+        }
+
+        for(let i = this.cells.length - 1; i > 0; i --){
+            let a = this.cells[i];
+            let b = this.cells[i - 1];
+            if(Math.abs(a.x - b.x) < this.eps && Math.abs(a.y - b.y) < this.eps){
+                continue;
+            }else if(Math.abs(a.x - b.x) < this.eps){    // 竖直方向
+                ctx.fillRect((a.x - 0.5 * 0.8) * L, Math.min(a.y, b.y) * L, L * 0.8, Math.abs(a.y - b.y) * L);
+            }else{      // 水平方向
+                ctx.fillRect(Math.min(a.x, b.x) * L, (a.y - 0.5 * 0.8) * L, Math.abs(a.x - b.x) * L, L * 0.8);
+            }
         }
     }
 }
