@@ -17,6 +17,23 @@ export class Snake extends GameObject{
         this.dc = [0, 1, 0, -1];
         this.step = 0;
         this.eps = 1e-2;
+
+        this.eye_direction = 0;
+        if(this.id === 2){
+            this.eye_direction = 2;
+        }
+        this.eye_dx = [
+            [-1, 1],
+            [1, 1],
+            [-1, 1],
+            [-1, -1]
+        ];
+        this.eye_dy = [
+            [-1, -1],
+            [-1, 1],
+            [1, 1],
+            [-1, 1]
+        ];
         
     }
     start(){
@@ -30,6 +47,7 @@ export class Snake extends GameObject{
     next_step(){
         const d = this.direction;
         this.next_cell = new Cell(this.cells[0].r + this.dr[d], this.cells[0].c + this.dc[d]);
+        this.eye_direction = d;
         this.direction = -1;
         this.status = "move";
         this.step ++;
@@ -93,7 +111,7 @@ export class Snake extends GameObject{
         const L = this.gamemap.L;
         ctx.fillStyle = this.color;
         if(this.status === "die"){
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = "white";
         }
         for(let cell of this.cells){
             ctx.beginPath()
@@ -112,5 +130,16 @@ export class Snake extends GameObject{
                 ctx.fillRect(Math.min(a.x, b.x) * L, (a.y - 0.5 * 0.8) * L, Math.abs(a.x - b.x) * L, L * 0.8);
             }
         }
+
+        ctx.fillStyle = "black";
+        for(let i = 0; i < 2; i ++){
+            ctx.beginPath();
+            ctx.arc(
+                (this.cells[0].x + this.eye_dx[this.eye_direction][i] * 0.15) * L, 
+                (this.cells[0].y + this.eye_dy[this.eye_direction][i] * 0.15) * L, 
+                L * 0.05, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
     }
 }
