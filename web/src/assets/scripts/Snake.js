@@ -38,6 +38,10 @@ export class Snake extends GameObject{
         for(let i = k; i > 0; i --){
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
         }
+
+        if(!this.gamemap.check_next_step_vaild(this.next_cell)){
+            this.status = "die";
+        }
     }
 
     check_tail_increasing(){
@@ -88,6 +92,9 @@ export class Snake extends GameObject{
         const ctx = this.gamemap.ctx;
         const L = this.gamemap.L;
         ctx.fillStyle = this.color;
+        if(this.status === "die"){
+            ctx.fillStyle = 'white';
+        }
         for(let cell of this.cells){
             ctx.beginPath()
             ctx.arc(cell.x * L, cell.y * L, L / 2 * 0.8, 0, 2 * Math.PI);

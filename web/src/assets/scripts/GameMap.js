@@ -127,6 +127,26 @@ export class GameMap extends GameObject {
         }
     }
 
+    check_next_step_vaild(cell){
+        for(let wall of this.walls){
+            if(wall.r === cell.r && wall.c === cell.c){
+                return false;
+            }
+        }
+        for(let snake of this.snakes){
+            let k = snake.cells.length;
+            if(!snake.check_tail_increasing()){
+                k --;
+            }
+            for(let i = 0; i < k; i ++){
+                if(snake.cells[i].r === cell.r && snake.cells[i].c === cell.c){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     update(){
         this.update_size();
         if(this.check_snake_ready()){
