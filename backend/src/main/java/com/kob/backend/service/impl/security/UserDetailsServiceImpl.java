@@ -1,9 +1,9 @@
-package com.kob.backend.service.impl;
+package com.kob.backend.service.impl.security;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kob.backend.bo.user.UserDetailsImpl;
 import com.kob.backend.mapper.UserMapper;
-import com.kob.backend.model.User;
+import com.kob.backend.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

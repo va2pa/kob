@@ -1,6 +1,6 @@
 package com.kob.backend.bo.user;
 
-import com.kob.backend.model.User;
+import com.kob.backend.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
