@@ -1,6 +1,8 @@
 package com.kob.backend.config.filter;
 
 import com.kob.backend.bo.user.UserDetailsImpl;
+import com.kob.backend.exception.http.ForbiddenException;
+import com.kob.backend.exception.http.UnAuthenticated;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.entity.User;
 import com.kob.backend.util.JwtUtil;
@@ -40,13 +42,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             Claims claims = JwtUtil.parseJWT(token);
             userid = claims.getSubject();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new UnAuthenticated(500);
         }
 
         User user = userMapper.selectById(Integer.parseInt(userid));
 
         if (user == null) {
-            throw new RuntimeException("用户名未登录");
+            throw new ForbiddenException(1003);
         }
 
         UserDetailsImpl loginUser = new UserDetailsImpl(user);

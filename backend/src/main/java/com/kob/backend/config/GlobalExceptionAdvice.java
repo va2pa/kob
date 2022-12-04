@@ -41,11 +41,50 @@ public class GlobalExceptionAdvice {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     public UnifyResponse handleException(HttpServletRequest req, Exception e) {
-        int code = 1;
+        int code = 5;
         e.printStackTrace();
         String RequestURL = req.getMethod() + " " + req.getRequestURI();
         return new UnifyResponse(code, e.getMessage(), RequestURL);
     }
 
+    /**
+     * 处理请求体参数异常(优先级高于url)
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public UnifyResponse handleMethodArgumentNotValidException(HttpServletRequest req, MethodArgumentNotValidException e){
+        int code = 6;
+        StringBuffer stringBuffer = new StringBuffer();
+        e.getBindingResult().getAllErrors().forEach(t -> {
+            if(t instanceof FieldError){
+                String field = ((FieldError) t).getField();
+                stringBuffer.append(field).append(": ");
+            }
+            stringBuffer.append(t.getDefaultMessage()).append(",");
+        });
+        String message = stringBuffer.substring(0, stringBuffer.length() - 1);
+        String RequestURL = req.getMethod() + " " + req.getRequestURI();
+        return new UnifyResponse(code, message, RequestURL);
+    }
+
+    /**
+     * 处理url请求参数异常
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public UnifyResponse handleConstraintViolationException(HttpServletRequest req, ConstraintViolationException e){
+        int code = 7;
+        StringBuffer stringBuffer = new StringBuffer();
+        e.getConstraintViolations().forEach(t -> {
+            String methodAndParam = t.getPropertyPath().toString();
+            String param = methodAndParam.substring(methodAndParam.indexOf(".") + 1);
+            stringBuffer.append(param).append(": ").append(t.getMessage()).append(",");
+        });
+        String message = stringBuffer.substring(0, stringBuffer.length() - 1);
+        String RequestURL = req.getMethod() + " " + req.getRequestURI();
+        return new UnifyResponse(code, message, RequestURL);
+    }
 
 }
