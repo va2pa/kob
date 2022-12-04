@@ -24,6 +24,7 @@ export default {
             state.photo = "";
             state.token = "";
             state.is_login = false;
+            localStorage.removeItem("token");
         }
     },
     actions: {
@@ -36,6 +37,7 @@ export default {
                     password: data.password,
                 },
                 success(resp){
+                    localStorage.setItem("token", resp.token);
                     conotext.commit("updateToken", resp.token);
                     data.success(resp);
                 },
