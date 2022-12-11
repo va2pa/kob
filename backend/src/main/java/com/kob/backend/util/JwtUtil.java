@@ -1,5 +1,6 @@
 package com.kob.backend.util;
 
+import com.kob.backend.exception.http.UnAuthenticated;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -58,5 +59,14 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(jwt)
                 .getBody();
+    }
+
+    public static Long getUserId(String token){
+        try {
+            Claims claims = JwtUtil.parseJWT(token);
+            return Long.parseLong(claims.getSubject());
+        } catch (Exception e) {
+            throw new UnAuthenticated(500);
+        }
     }
 }

@@ -52,7 +52,7 @@ export default {
     setup(){
         const route = new useRoute();
         let route_name = computed(() => route.name);
-        const store = new useStore();
+        const store = useStore();
         const logout = () => {
             store.commit("logout");
         }

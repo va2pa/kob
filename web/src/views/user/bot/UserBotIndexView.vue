@@ -133,7 +133,7 @@ export default {
         ace.config.set(
             "basePath", 
             "https://cdn.jsdelivr.net/npm/ace-builds@" + require('ace-builds').version + "/src-noconflict/")
-        const store = new useStore();
+        const store = useStore();
         let bots = ref([]);
         let newbot = reactive({
             error_message: "",

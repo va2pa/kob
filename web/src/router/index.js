@@ -86,17 +86,25 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (store.state.user.is_login) {
-    next();
+  if (store.state.user.is_login) {  // 已登录
+    if (to.name === "user_account_login") {
+      next({name: "pk_index"});
+    } else {
+      next();
+    }
   } else {
     const token = localStorage.getItem("token");
     if (token) {
       store.commit("updateToken", token);
       store.dispatch("getInfo", {
-        success: () => {
-          next();
+        success: () => {  // 已登录
+          if (to.name === "user_account_login") {
+            next({name: "pk_index"});
+          } else {
+            next();
+          }
         },
-        error: () => {
+        error: () => {  // 未登录，token失效
           if (to.meta.requestAuth) {
             next({name: "user_account_login"});
           } else {
@@ -104,7 +112,7 @@ router.beforeEach((to, from, next) => {
           }
         }
       });
-    } else {
+    } else {  //未登录
       if (to.meta.requestAuth) {
         next({name: "user_account_login"});
       } else {
