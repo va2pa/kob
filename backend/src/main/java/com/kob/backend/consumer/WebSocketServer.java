@@ -2,6 +2,7 @@ package com.kob.backend.consumer;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.kob.backend.consumer.util.Game;
 import com.kob.backend.entity.User;
 import com.kob.backend.exception.http.ForbiddenException;
 import com.kob.backend.mapper.UserMapper;
@@ -25,7 +26,6 @@ public class WebSocketServer {
     private static final CopyOnWriteArraySet<User> matchpool = new CopyOnWriteArraySet<>();
     private User user;
     private Session session;
-
     private static UserMapper userMapper;
 
     @Autowired
@@ -73,16 +73,21 @@ public class WebSocketServer {
             matchpool.remove(userA);
             matchpool.remove(userB);
 
+            Game game = new Game(13, 14, 60);
+            game.createMap();
+
             JSONObject resA = new JSONObject();
             resA.put("event", "match-success");
             resA.put("opponent_photo", userB.getPhoto());
             resA.put("opponent_username", userB.getUsername());
+            resA.put("gamemap", game.getG());
             userSocketMap.get(userA.getId()).sendMessage(resA.toJSONString());
 
             JSONObject resB = new JSONObject();
             resB.put("event", "match-success");
             resB.put("opponent_photo", userA.getPhoto());
             resB.put("opponent_username", userA.getUsername());
+            resB.put("gamemap", game.getG());
             userSocketMap.get(userB.getId()).sendMessage(resB.toJSONString());
         }
     }

@@ -5,6 +5,7 @@ export default {
         socket: null,
         opponent_username: "",
         opponent_photo: "",
+        gamemap: null
     },
     mutations: {
         updateSocket(state, socket) {
@@ -16,6 +17,9 @@ export default {
         },
         updateStatus(state, status) {
             state.status = status;
+        },
+        updateGamemap(state, gamemap) {
+            state.gamemap = gamemap;
         }
     },
     actions: {
