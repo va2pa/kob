@@ -22,11 +22,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
-    private static final ConcurrentHashMap<Long, WebSocketServer> userSocketMap = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<Long, WebSocketServer> userSocketMap = new ConcurrentHashMap<>();
     private static final CopyOnWriteArraySet<User> matchpool = new CopyOnWriteArraySet<>();
     private User user;
     private Session session;
     private static UserMapper userMapper;
+
+    private Game game;
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
@@ -73,21 +75,33 @@ public class WebSocketServer {
             matchpool.remove(userA);
             matchpool.remove(userB);
 
-            Game game = new Game(13, 14, 60);
+            Game game = new Game(13, 14, 20, userA.getId(), userB.getId());
             game.createMap();
+            userSocketMap.get(userA.getId()).game = game;
+            userSocketMap.get(userB.getId()).game = game;
+            game.start();
+
+            JSONObject gameResp = new JSONObject();
+            gameResp.put("map", game.getG());
+            gameResp.put("a_id", userA.getId());
+            gameResp.put("a_sx", game.getPlayerA().getSx());
+            gameResp.put("a_sy", game.getPlayerA().getSy());
+            gameResp.put("b_id", userB.getId());
+            gameResp.put("b_sx", game.getPlayerA().getSx());
+            gameResp.put("b_sy", game.getPlayerA().getSy());
 
             JSONObject resA = new JSONObject();
             resA.put("event", "match-success");
             resA.put("opponent_photo", userB.getPhoto());
             resA.put("opponent_username", userB.getUsername());
-            resA.put("gamemap", game.getG());
+            resA.put("game", gameResp);
             userSocketMap.get(userA.getId()).sendMessage(resA.toJSONString());
 
             JSONObject resB = new JSONObject();
             resB.put("event", "match-success");
             resB.put("opponent_photo", userA.getPhoto());
             resB.put("opponent_username", userA.getUsername());
-            resB.put("gamemap", game.getG());
+            resB.put("game", gameResp);
             userSocketMap.get(userB.getId()).sendMessage(resB.toJSONString());
         }
     }
@@ -95,6 +109,14 @@ public class WebSocketServer {
     private void stopMatching(){
         System.out.println("stop matching");
         matchpool.remove(this.user);
+    }
+
+    private void move(Integer direction) {
+        if (game.getPlayerA().getUserId().equals(user.getId())){
+            game.setNextStepA(direction);
+        }else if (game.getPlayerB().getUserId().equals(user.getId())){
+            game.setNextStepB(direction);
+        }
     }
 
     @OnMessage
@@ -107,6 +129,8 @@ public class WebSocketServer {
             startMatching();
         } else if ("stop-matching".equals(event)){
             stopMatching();
+        } else if ("move".equals(event)) {
+            move(data.getInteger("direction"));
         }
     }
 
@@ -115,7 +139,7 @@ public class WebSocketServer {
         error.printStackTrace();
     }
 
-    private void sendMessage(String message) {
+    public void sendMessage(String message) {
         synchronized(this.session) {
             try {
                 this.session.getBasicRemote().sendText(message);
