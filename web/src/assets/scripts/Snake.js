@@ -57,9 +57,9 @@ export class Snake extends GameObject{
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
         }
 
-        if(!this.gamemap.check_next_step_vaild(this.next_cell)){
-            this.status = "die";
-        }
+        // if(!this.gamemap.check_next_step_vaild(this.next_cell)){
+        //     this.status = "die";
+        // }
     }
 
     check_tail_increasing(){

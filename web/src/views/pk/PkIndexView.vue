@@ -49,6 +49,14 @@ export default {
                     snake1.set_direction(data.b_direction);
                 }else if(data.event === "result") {
                     console.log(data);
+                    const gameObject = store.state.pk.gameObject;
+                    const [snake0, snake1] = gameObject.snakes;
+                    if(data.loser === "all" || data.loser === "A") {
+                        snake0.status = "die";
+                    }
+                    if(data.loser === "all" || data.loser === "B") {
+                        snake1.status = "die";
+                    }
                 }
             };
 

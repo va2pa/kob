@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.parameters.P;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -141,7 +142,36 @@ public class Game extends Thread{
         return false;
     }
 
+    private boolean checkNextStepValid(List<Cell> cellsA, List<Cell> cellsB) {
+        int n = cellsA.size();
+        Cell cell = cellsA.get(n - 1);
+        if (g[cell.getX()][cell.getY()] == 1) {
+            return false;
+        }
+        for(int i = 0; i < n - 1; i ++) {
+            if (cell.getX() == cellsA.get(i).getX() && cell.getY() == cellsA.get(i).getY()
+                || cell.getX() == cellsB.get(i).getX() && cell.getY() == cellsB.get(i).getY()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void judge() {
+        List<Cell> cellsA = playerA.getCells();
+        List<Cell> cellsB = playerB.getCells();
+        boolean validA = checkNextStepValid(cellsA, cellsB);
+        boolean validB = checkNextStepValid(cellsB, cellsA);
+        if (!validA || !validB) {
+            status = "finish";
+            if (!validA && !validB) {
+                loser = "all";
+            }else if (!validA) {
+                loser = "A";
+            }else {
+                loser = "B";
+            }
+        }
 
     }
 
