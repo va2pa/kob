@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kob.backend.consumer.util.Game;
 import com.kob.backend.entity.User;
 import com.kob.backend.exception.http.ForbiddenException;
+import com.kob.backend.mapper.RecordMapper;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +28,17 @@ public class WebSocketServer {
     private User user;
     private Session session;
     private static UserMapper userMapper;
-
+    public static RecordMapper recordMapper;
     private Game game;
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
         WebSocketServer.userMapper = userMapper;
     }
-
+    @Autowired
+    public void setRecordMapper(RecordMapper recordMapper) {
+        WebSocketServer.recordMapper = recordMapper;
+    }
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) {
         // 建立连接

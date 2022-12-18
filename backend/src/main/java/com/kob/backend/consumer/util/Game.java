@@ -2,6 +2,7 @@ package com.kob.backend.consumer.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
+import com.kob.backend.entity.Record;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.parameters.P;
@@ -192,10 +193,38 @@ public class Game extends Thread{
         }
         sendAllMessage(resp.toJSONString());
     }
+
+    public String getMapString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = 0; i < rows; i ++){
+            for(int j = 0;j < cols; j ++){
+                stringBuilder.append(g[i][j]);
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private void sendToDatabase() {
+        Record record = Record.builder()
+                .aId(playerA.getUserId())
+                .aSx(playerA.getSx())
+                .aSy(playerA.getSy())
+                .bId(playerB.getUserId())
+                .bSx(playerB.getSx())
+                .bSy(playerB.getSy())
+                .aSteps(playerA.getStepListString())
+                .bSteps(playerB.getStepListString())
+                .map(getMapString())
+                .loser(loser)
+                .build();
+        WebSocketServer.recordMapper.insert(record);
+    }
+
     private void sendResult() {
         JSONObject resp = new JSONObject();
         resp.put("event", "result");
         resp.put("loser", loser);
+        sendToDatabase();
         sendAllMessage(resp.toJSONString());
     }
     @Override

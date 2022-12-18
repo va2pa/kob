@@ -38,4 +38,12 @@ public class Player {
         }
         return cells;
     }
+
+    public String getStepListString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Integer step : stepList) {
+            stringBuilder.append(step);
+        }
+        return stringBuilder.toString();
+    }
 }
