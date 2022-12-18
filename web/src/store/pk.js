@@ -12,7 +12,8 @@ export default {
         b_id: 0,
         b_sx: 0, 
         b_sy: 0,
-        gameObject: null
+        gameObject: null,
+        loser: "none"
     },
     mutations: {
         updateSocket(state, socket) {
@@ -36,6 +37,9 @@ export default {
         },
         updateGameObject(state, gameObject) {
             state.gameObject = gameObject;
+        },
+        updateLoser(state, loser) {
+            state.loser = loser;
         }
     },
     actions: {

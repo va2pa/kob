@@ -122,9 +122,9 @@ public class Game extends Thread{
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        for (int i = 0; i < 5; i ++){
+        for (int i = 0; i < 50; i ++){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
                 lock.lock();
                 try {
                     if (this.nextStepA != null && this.nextStepB != null) {
