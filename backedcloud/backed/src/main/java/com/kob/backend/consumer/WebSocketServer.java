@@ -10,6 +10,9 @@ import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -24,12 +27,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class WebSocketServer {
 
     public static final ConcurrentHashMap<Long, WebSocketServer> userSocketMap = new ConcurrentHashMap<>();
-    private static final CopyOnWriteArraySet<User> matchpool = new CopyOnWriteArraySet<>();
     private User user;
     private Session session;
     private static UserMapper userMapper;
     public static RecordMapper recordMapper;
+    public static RestTemplate restTemplate;
     private Game game;
+
+    private static final String addPlayerUrl = "http://127.0.0.1:5001/player/add/";
+    private static final String removePlayerUrl = "http://127.0.0.1:5001/player/remove/";
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
@@ -38,6 +44,10 @@ public class WebSocketServer {
     @Autowired
     public void setRecordMapper(RecordMapper recordMapper) {
         WebSocketServer.recordMapper = recordMapper;
+    }
+    @Autowired
+    public void setRestTemplate(RestTemplate restTemplate) {
+        WebSocketServer.restTemplate = restTemplate;
     }
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) {
@@ -59,60 +69,63 @@ public class WebSocketServer {
         System.out.println("close!");
         if (this.user != null) {
             userSocketMap.remove(this.user.getId());
-            matchpool.remove(this.user);
+        }
+    }
+
+    public static void startGame(Long aId, Long bId) {
+        User userA = userMapper.selectById(aId);
+        User userB = userMapper.selectById(bId);
+        Game game = new Game(13, 14, 20, userA.getId(), userB.getId());
+        game.createMap();
+        if (userSocketMap.get(userA.getId()) != null) {
+            userSocketMap.get(userA.getId()).game = game;
+        }
+        if (userSocketMap.get(userB.getId()) != null) {
+            userSocketMap.get(userB.getId()).game = game;
+        }
+        game.start();
+
+        JSONObject gameResp = new JSONObject();
+        gameResp.put("map", game.getG());
+        gameResp.put("a_id", userA.getId());
+        gameResp.put("a_sx", game.getPlayerA().getSx());
+        gameResp.put("a_sy", game.getPlayerA().getSy());
+        gameResp.put("b_id", userB.getId());
+        gameResp.put("b_sx", game.getPlayerA().getSx());
+        gameResp.put("b_sy", game.getPlayerA().getSy());
+
+        JSONObject resA = new JSONObject();
+        resA.put("event", "match-success");
+        resA.put("opponent_photo", userB.getPhoto());
+        resA.put("opponent_username", userB.getUsername());
+        resA.put("game", gameResp);
+        if (userSocketMap.get(userA.getId()) != null) {
+            userSocketMap.get(userA.getId()).sendMessage(resA.toJSONString());
+        }
+
+        JSONObject resB = new JSONObject();
+        resB.put("event", "match-success");
+        resB.put("opponent_photo", userA.getPhoto());
+        resB.put("opponent_username", userA.getUsername());
+        resB.put("game", gameResp);
+        if (userSocketMap.get(userB.getId()) != null) {
+            userSocketMap.get(userB.getId()).sendMessage(resB.toJSONString());
         }
     }
 
     private void startMatching(){
         System.out.println("start matching");
-        matchpool.add(this.user);
-
-        while(matchpool.size() >= 2){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            Iterator<User> iterator = matchpool.iterator();
-            User userA = iterator.next();
-            User userB = iterator.next();
-            matchpool.remove(userA);
-            matchpool.remove(userB);
-
-            Game game = new Game(13, 14, 20, userA.getId(), userB.getId());
-            game.createMap();
-            userSocketMap.get(userA.getId()).game = game;
-            userSocketMap.get(userB.getId()).game = game;
-            game.start();
-
-            JSONObject gameResp = new JSONObject();
-            gameResp.put("map", game.getG());
-            gameResp.put("a_id", userA.getId());
-            gameResp.put("a_sx", game.getPlayerA().getSx());
-            gameResp.put("a_sy", game.getPlayerA().getSy());
-            gameResp.put("b_id", userB.getId());
-            gameResp.put("b_sx", game.getPlayerA().getSx());
-            gameResp.put("b_sy", game.getPlayerA().getSy());
-
-            JSONObject resA = new JSONObject();
-            resA.put("event", "match-success");
-            resA.put("opponent_photo", userB.getPhoto());
-            resA.put("opponent_username", userB.getUsername());
-            resA.put("game", gameResp);
-            userSocketMap.get(userA.getId()).sendMessage(resA.toJSONString());
-
-            JSONObject resB = new JSONObject();
-            resB.put("event", "match-success");
-            resB.put("opponent_photo", userA.getPhoto());
-            resB.put("opponent_username", userA.getUsername());
-            resB.put("game", gameResp);
-            userSocketMap.get(userB.getId()).sendMessage(resB.toJSONString());
-        }
+        MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+        data.add("user_id", this.user.getId().toString());
+        data.add("rating", this.user.getRating().toString());
+        restTemplate.postForObject(addPlayerUrl, data, String.class);
     }
 
     private void stopMatching(){
         System.out.println("stop matching");
-        matchpool.remove(this.user);
+        MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+        data.add("user_id", this.user.getId().toString());
+        restTemplate.postForObject(removePlayerUrl, data, String.class);
     }
 
     private void move(Integer direction) {

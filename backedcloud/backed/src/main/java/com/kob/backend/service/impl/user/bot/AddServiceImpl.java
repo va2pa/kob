@@ -28,7 +28,6 @@ public class AddServiceImpl implements AddService {
                 .title(title)
                 .description(description)
                 .content(content)
-                .rating(1500L)
                 .build();
         botMapper.insert(bot);
     }

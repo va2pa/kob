@@ -16,14 +16,14 @@ public class MatchingController {
 
     @PostMapping("/player/add/")
     public String addPlayer(@RequestParam MultiValueMap<String, String> data) {
-        long userId = Long.parseLong(Objects.requireNonNull(data.getFirst("userId")));
-        Integer rating = Integer.parseInt(Objects.requireNonNull(data.getFirst("userId")));
+        long userId = Long.parseLong(Objects.requireNonNull(data.getFirst("user_id")));
+        long rating = Long.parseLong(Objects.requireNonNull(data.getFirst("rating")));
         return matchingService.addPlayer(userId, rating);
     }
 
     @PostMapping("/player/remove/")
     public String removePlayer(@RequestParam MultiValueMap<String, String> data) {
-        long userId = Long.parseLong(Objects.requireNonNull(data.getFirst("userId")));
+        long userId = Long.parseLong(Objects.requireNonNull(data.getFirst("user_id")));
         return matchingService.removePlayer(userId);
     }
 }

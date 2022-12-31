@@ -17,6 +17,4 @@ public class Bot extends BaseEntity{
     private String description;
 
     private String content;
-
-    private Long rating;
 }

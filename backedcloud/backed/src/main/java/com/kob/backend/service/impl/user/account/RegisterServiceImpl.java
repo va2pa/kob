@@ -31,6 +31,7 @@ public class RegisterServiceImpl implements RegisterService {
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .photo(photo)
+                .rating(1500L)
                 .build();
         this.userMapper.insert(user);
     }

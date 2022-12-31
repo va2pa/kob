@@ -177,8 +177,12 @@ public class Game extends Thread{
     }
 
     private void sendAllMessage(String message) {
-        WebSocketServer.userSocketMap.get(playerA.getUserId()).sendMessage(message);
-        WebSocketServer.userSocketMap.get(playerB.getUserId()).sendMessage(message);
+        if (WebSocketServer.userSocketMap.get(playerA.getUserId()) != null) {
+            WebSocketServer.userSocketMap.get(playerA.getUserId()).sendMessage(message);
+        }
+        if (WebSocketServer.userSocketMap.get(playerB.getUserId()) != null) {
+            WebSocketServer.userSocketMap.get(playerB.getUserId()).sendMessage(message);
+        }
     }
     private void sendMove() {
         JSONObject resp = new JSONObject();
