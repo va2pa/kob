@@ -21,15 +21,15 @@ public class MatchPoolService extends Thread{
 
     private final static String startGameUrl = "http://127.0.0.1:5000/pk/start/game/";
 
-    public void addPlayer(Long userId, Long rating) {
+    public void addPlayer(Long userId, Long rating, Long botId) {
         lock.lock();
         try {
-            players.add(new Player(userId, rating, 0));
+            players.add(new Player(userId, rating, botId, 0));
         }finally {
             lock.unlock();
         }
     }
-    private void removePlayer(Long userId) {
+    public void removePlayer(Long userId) {
         lock.lock();
         try {
             ArrayList<Player> newPlayers = new ArrayList<>();
@@ -90,7 +90,9 @@ public class MatchPoolService extends Thread{
         System.out.println("sendResult " + a + "," + b);
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("a_id", a.getUserId().toString());
+        data.add("a_bot_id", a.getUserId().toString());
         data.add("b_id", b.getUserId().toString());
+        data.add("b_bot_id", b.getBotId().toString());
         restTemplate.postForObject(startGameUrl, data, String.class);
     }
 

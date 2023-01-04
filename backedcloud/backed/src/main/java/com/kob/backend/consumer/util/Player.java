@@ -12,6 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Player {
     private Long userId;
+    private Long botId;
+    private String botCode;
     private Integer sx;
     private Integer sy;
 

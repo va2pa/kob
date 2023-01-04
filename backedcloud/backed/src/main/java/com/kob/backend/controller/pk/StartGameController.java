@@ -21,8 +21,10 @@ public class StartGameController {
     @PostMapping("start/game/")
     public Ok startGame(@RequestParam MultiValueMap<String, String> data) {
         long aId = Long.parseLong(Objects.requireNonNull(data.getFirst("a_id")));
+        long aBotId = Long.parseLong(Objects.requireNonNull(data.getFirst("a_bot_id")));
         long bId = Long.parseLong(Objects.requireNonNull(data.getFirst("b_id")));
-        startGameService.startGame(aId, bId);
+        long bBotId = Long.parseLong(Objects.requireNonNull(data.getFirst("b_bot_id")));
+        startGameService.startGame(aId, aBotId, bId, bBotId);
         return UnifyResponse.ok();
     }
 }

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 public class StartGameServiceImpl implements StartGameService {
 
     @Override
-    public void startGame(Long aId, Long bId) {
-        System.out.println("start game " + aId + ", " + bId);
-        WebSocketServer.startGame(aId, bId);
+    public void startGame(Long aId, Long aBotId, Long bId, Long bBotId) {
+        System.out.println("start game " + aId + " " + aBotId + ", "  + bId + " " + bBotId);
+        WebSocketServer.startGame(aId, aBotId, bId, bBotId);
     }
 }
