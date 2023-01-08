@@ -53,7 +53,6 @@ export default {
                     event: "start-matching",
                     bot_id: select_bot.value
                 }));
-
             } else {
                 match_btn_info.value = "开始匹配";
                 socket.send(JSON.stringify({

@@ -35,7 +35,7 @@ public class WebSocketServer {
     public static RecordMapper recordMapper;
     public static BotMapper botMapper;
     public static RestTemplate restTemplate;
-    private Game game;
+    public Game game;
 
     private static final String addPlayerUrl = "http://127.0.0.1:5001/player/add/";
     private static final String removePlayerUrl = "http://127.0.0.1:5001/player/remove/";
@@ -92,7 +92,6 @@ public class WebSocketServer {
         if (userSocketMap.get(userB.getId()) != null) {
             userSocketMap.get(userB.getId()).game = game;
         }
-        game.start();
 
         JSONObject gameResp = new JSONObject();
         gameResp.put("map", game.getG());
@@ -120,6 +119,12 @@ public class WebSocketServer {
         if (userSocketMap.get(userB.getId()) != null) {
             userSocketMap.get(userB.getId()).sendMessage(resB.toJSONString());
         }
+        try {
+            Thread.sleep(2100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        game.start();
     }
 
     private void startMatching(Long botId){

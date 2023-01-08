@@ -30,6 +30,7 @@ public class Player {
         int x = sx;
         int y = sy;
         int steps = 0;
+        cells.add(new Cell(x, y));
         for (Integer step : stepList) {
             x += dx[step];
             y += dy[step];
