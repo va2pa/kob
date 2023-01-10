@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
 import com.kob.backend.entity.Bot;
 import com.kob.backend.entity.Record;
+import com.kob.backend.entity.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.parameters.P;
@@ -254,6 +255,17 @@ public class Game extends Thread{
     }
 
     private void sendToDatabase() {
+        User userA = WebSocketServer.userMapper.selectById(playerA.getUserId());
+        User userB = WebSocketServer.userMapper.selectById(playerB.getUserId());
+        if ("A".equals(loser)) {
+            userA.setRating(userA.getRating() - 5);
+            userB.setRating(userB.getRating() + 10);
+        }else {
+            userA.setRating(userA.getRating() + 10);
+            userB.setRating(userB.getRating() - 5);
+        }
+        WebSocketServer.userMapper.updateById(userA);
+        WebSocketServer.userMapper.updateById(userB);
         Record record = Record.builder()
                 .aId(playerA.getUserId())
                 .aSx(playerA.getSx())
