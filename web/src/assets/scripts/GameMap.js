@@ -32,20 +32,41 @@ export class GameMap extends GameObject {
     }
 
     add_listening_events(){
-        this.ctx.canvas.focus();
-
-        this.ctx.canvas.addEventListener("keydown", e => {
-            let direction = -1;
-            if (e.key === 'w') direction = 0;
-            else if (e.key === 'd') direction = 1;
-            else if (e.key === 's') direction = 2;
-            else if (e.key === 'a') direction = 3;
-            
-            this.store.state.pk.socket.send(JSON.stringify({
-                event: "move",
-                direction: direction
-            }));
-        });
+        if(this.store.state.record.is_record) {
+            const a_steps = this.store.state.record.a_steps;
+            const b_steps = this.store.state.record.b_steps;
+            const loser = this.store.state.record.record_loser;
+            const [snake0, snake1] = this.snakes;
+            let k = 0;
+            const interval_move = setInterval(function() {
+                if(k < a_steps.length - 1) {
+                    snake0.set_direction(parseInt(a_steps[k]));
+                    snake1.set_direction(parseInt(b_steps[k]));
+                }else {
+                    if(loser === "all" || loser === "A") {
+                        snake0.status = "die";
+                    }else if(loser === "all" || loser === "B") {
+                        snake1.status = "die";
+                    }
+                    clearInterval(interval_move);
+                }
+                k++;
+            }, 300);
+        }else {
+            this.ctx.canvas.focus();
+            this.ctx.canvas.addEventListener("keydown", e => {
+                let direction = -1;
+                if (e.key === 'w') direction = 0;
+                else if (e.key === 'd') direction = 1;
+                else if (e.key === 's') direction = 2;
+                else if (e.key === 'a') direction = 3;
+                
+                this.store.state.pk.socket.send(JSON.stringify({
+                    event: "move",
+                    direction: direction
+                }));
+            });
+        }
     }
 
     start(){

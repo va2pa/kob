@@ -21,8 +21,10 @@ export default {
         const socket_url = `ws://127.0.0.1:5000/websocket/${store.state.user.token}/`;
         let socket = null;
 
+        store.commit("updateLoser", "none");
+        store.commit("updateIsRecord", false);
+
         onMounted(() => {
-            store.commit("updateLoser", "none");
             store.commit("updateOpponent", {
                 username: "我的对手",
                 photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png"
@@ -40,11 +42,11 @@ export default {
                         username: data.opponent_username,
                         photo: data.opponent_photo
                     });
+                    store.commit("updateGame",data.game);
                     setTimeout(() => {
                         store.commit("updateStatus", "playing");
                     }, 2000);
                     console.log(data);
-                    store.commit("updateGame",data.game);
                 }else if(data.event === "move") {
                     console.log(data);
                     const gameObject = store.state.pk.gameObject;

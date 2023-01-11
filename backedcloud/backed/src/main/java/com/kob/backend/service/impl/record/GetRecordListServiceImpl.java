@@ -26,7 +26,7 @@ public class GetRecordListServiceImpl implements GetRecordListService {
     public IPage<Record> getRecordList(Integer page, Integer count) {
         IPage<Record> iPage = new Page<>(page, count);
         QueryWrapper<Record> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("id");
+        queryWrapper.lambda().orderByDesc(Record::getId);
         return recordMapper.selectPage(iPage, queryWrapper);
     }
 }

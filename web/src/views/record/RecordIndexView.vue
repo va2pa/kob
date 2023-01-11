@@ -1,6 +1,6 @@
 <template>
     <content-field>
-        <table class="table table-hover" style="text-align: center;">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>A</th>
@@ -29,7 +29,7 @@
                         {{ record.record.create_time }}
                     </td>
                     <td>
-                        <button type="button" class="btn btn-secondary">查看录像</button>
+                        <button type="button" class="btn btn-secondary" @click="open_record_content(record.record.id)">查看录像</button>
                     </td>
                 </tr>
             </tbody>
@@ -55,6 +55,7 @@
 import ContentField from "../../components/ContentField.vue"
 import { useStore } from 'vuex';
 import { ref } from 'vue';
+import router from '../../router'
 import $ from 'jquery';
 
 export default {
@@ -81,6 +82,7 @@ export default {
         }
 
         const update_pages = () => {
+            max_pages.value = parseInt(Math.ceil(total_record / count));
             let new_pages = [];
             let start = 0;
             let end = 0;
@@ -101,10 +103,8 @@ export default {
             }
             pages.value = new_pages;
         }
-        console.log(total_record);
         const pull_page = page => {
             current_page.value = page;
-            console.log(current_page);
             $.ajax({
                 url: "http://127.0.0.1:5000/record/getlist/",
                 type: "get",
@@ -118,9 +118,6 @@ export default {
                 success(resp){
                     records.value = resp.items;
                     total_record = resp.total;
-                    console.log(records.value);
-                    max_pages.value = parseInt(Math.ceil(total_record / count));
-
                     update_pages();
                 },
                 error(resp) {
@@ -129,12 +126,55 @@ export default {
             });
         }
         pull_page(current_page.value);
+
+        const stringTo2D = map => {
+            let g = [];
+            for (let i = 0, k = 0; i < 13; i ++ ) {
+                let line = [];
+                for (let j = 0; j < 14; j ++, k ++ ) {
+                    if (map[k] === '0') line.push(0);
+                    else line.push(1);
+                }
+                g.push(line);
+            }
+            return g;
+        }
+
+        const open_record_content = (recordId) => {
+            for (const record of records.value) {
+                if(record.record.id === recordId) {
+                    store.commit("updateIsRecord", true);
+                    store.commit("updateSteps", {
+                        a_steps: record.record.asteps,
+                        b_steps: record.record.bsteps
+                    });
+                    store.commit("updateRecordLoser", record.record.loser);
+                    store.commit("updateGame", {
+                        map: stringTo2D(record.record.map),
+                        a_id: record.record.aid,
+                        a_sx: record.record.asx,
+                        a_sy: record.record.asx,
+                        b_id: record.record.bid,
+                        b_sx: record.record.bsx,
+                        b_sy: record.record.bsy
+                    });
+                    router.push({
+                        name: "record_content",
+                        params: {
+                            recordId
+                        }
+                    })
+                    break;
+                }
+            }
+        }
         return {
             records,
             pages,
             current_page,
             max_pages,
-            click_page
+            click_page,
+            open_record_content
         }
     }
 }
