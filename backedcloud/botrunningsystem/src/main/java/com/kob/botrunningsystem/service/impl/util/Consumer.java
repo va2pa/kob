@@ -8,7 +8,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Component
 public class Consumer extends Thread{
@@ -44,11 +48,18 @@ public class Consumer extends Thread{
     public void run() {
         String uuid = UUID.randomUUID().toString().substring(0, 8);
         System.out.println(addUUID(bot.getBotCode(), uuid));
-        BotCodeInterface botCodeInterface = Reflect.compile(
+        Supplier<Integer> botCodeInterface = Reflect.compile(
                 "com.kob.botrunningsystem.util.BotCode" + uuid,
                 addUUID(bot.getBotCode(), uuid)
         ).create().get();
-        Integer direction = botCodeInterface.move(bot.getInput());
+        File file = new File("input.txt");
+        try(PrintWriter fout = new PrintWriter(file)) {
+            fout.println(bot.getInput());
+            fout.flush();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        Integer direction = botCodeInterface.get();
         sendResult(direction);
     }
 

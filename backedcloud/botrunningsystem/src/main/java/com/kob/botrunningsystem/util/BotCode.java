@@ -1,9 +1,23 @@
 package com.kob.botrunningsystem.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
-public class BotCode implements com.kob.botrunningsystem.util.BotCodeInterface {
+public class BotCode implements java.util.function.Supplier<Integer> {
+    @Override
+    public Integer get() {
+        File file = new File("input.txt");
+        try {
+            Scanner sc = new Scanner(file);
+            return move(sc.next());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static class Cell {
         private int x;
         private int y;
@@ -37,8 +51,8 @@ public class BotCode implements com.kob.botrunningsystem.util.BotCodeInterface {
         }
         return cells;
     }
-    @Override
-    public Integer move(String input) {
+
+    private Integer move(String input) {
         String[] strArray = input.split("#");
         String mapStr = strArray[0];
         int r = 13, c = 14;

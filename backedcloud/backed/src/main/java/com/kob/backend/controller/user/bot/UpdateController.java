@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/bot/")
+@RequestMapping("/api/user/bot/")
 @Validated
 public class UpdateController {
     @Autowired

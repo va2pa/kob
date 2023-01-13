@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/bot/")
+@RequestMapping("/api/user/bot/")
 public class RemoveController {
     @Autowired
     private RemoveService removeService;
